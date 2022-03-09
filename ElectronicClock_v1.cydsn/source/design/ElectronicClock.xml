@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rte>
+ <configset>
+  <config name="version" value="Erika 2"/>
+  <config name="path_out" value="{PROJECT_PATH}\out"/>
+  <config name="templateDir" value="{GEN_PATH}\..\templates"/>
+  <config name="userCodeStart" value="/\* USER CODE START {TAG} \*/"/>
+  <config name="userCodeEnd" value="/\* USER CODE END {TAG} \*/"/>
+  <config name="guivers" value="0.1.2"/>
+ </configset>
+ <naming>
+  <config name="signalpoolPrefix" value="sp_"/>
+  <config name="signalpoolPostfix" value=""/>
+  <config name="taskPrefix" value="tsk_"/>
+  <config name="taskPostfix" value=""/>
+  <config name="signalclassPrefix" value="sc_"/>
+  <config name="signalclassPostfix" value=""/>
+  <config name="signalobjectPrefix" value="so_"/>
+  <config name="signalobjectPostfix" value=""/>
+  <config name="swcPrefix" value="swc_"/>
+  <config name="swcPostfix" value=""/>
+  <config name="runnablePrefix" value=""/>
+  <config name="runnablePostfix" value="_run"/>
+  <config name="eventPrefix" value="ev_"/>
+  <config name="eventPostfix" value=""/>
+  <config name="resourcePrefix" value="res_"/>
+  <config name="resourcePostfix" value=""/>
+  <config name="addrPrefix" value="ADR_"/>
+  <config name="addrStartPostfix" value="_START"/>
+  <config name="addrEndPostfix" value="_END"/>
+ </naming>
+ <signalpools>
+  <signalpool description="Common signal pool for all signals" endaddr="ADR_SP_COMMON_END" name="sp_common" shortname="common" startaddr="ADR_SP_COMMON_START"/>
+ </signalpools>
+ <tasks>
+  <task description="Task for event triggered runnables" events="ev_event_onData" mode="Event" name="tsk_event" shortname="event" signalpoolsRO="sp_common" signalpoolsRW="sp_common" tickEvent="0" timertickperiod="0"/>
+  <task description="Cyclic task for cyclic runnables" events="" mode="Cyclic" name="tsk_cyclic" shortname="cyclic" signalpoolsRO="sp_common" signalpoolsRW="sp_common" tickEvent="0" timertickperiod="10"/>
+ </tasks>
+ <signalclasses>
+  <signalclass description="Events representation data type" name="sc_event" shortname="event"/>
+  <signalclass description="Clock data representation datatype" name="sc_clock" shortname="clock"/>
+  <signalclass description="Display respresentation datatype" name="sc_display" shortname="display"/>
+ </signalclasses>
+ <signalobjects>
+  <signalobject description="Events to trigger various tasks and runnables" indriver="0" name="so_event" onDataError="0" onDataUpdate="ev_event_onData" outdriver="0" resource="None" shortname="event" signalclass="sc_event" signalpool="sp_common"/>
+  <signalobject description="Clock signal content" indriver="0" name="so_clock" onDataError="0" onDataUpdate="0" outdriver="0" resource="None" shortname="clock" signalclass="sc_clock" signalpool="sp_common"/>
+  <signalobject description="Clock display object" indriver="0" name="so_display" onDataError="0" onDataUpdate="0" outdriver="default" resource="None" shortname="display" signalclass="sc_display" signalpool="sp_common"/>
+ </signalobjects>
+ <swcs>
+  <swc description="Software component for the electronic clock" name="swc_clock" shortname="clock"/>
+ </swcs>
+ <runnables>
+  <runnable component="swc_clock" cycletime="50" description="Runnable to process incoming events" events="" name="CLOCK_input_run" shortname="input" signalIN="" signalOUT="so_event" task="tsk_cyclic"/>
+  <runnable component="swc_clock" cycletime="0" description="Control runnable that runs the State Machine" events="ev_event_onData" name="CLOCK_control_run" shortname="control" signalIN="so_event" signalOUT="so_clock" task="tsk_event"/>
+  <runnable component="swc_clock" cycletime="250" description="Runnable for display driver" events="" name="CLOCK_display_run" shortname="display" signalIN="so_clock" signalOUT="so_display" task="tsk_cyclic"/>
+ </runnables>
+ <events>
+  <event description="Triggers control runnable on receiving input from the user" name="ev_event_onData" shortname="event_onData"/>
+ </events>
+ <resources/>
+</rte>
